@@ -4,10 +4,23 @@
  *
  * Version: 1.0.9
  *
+ *! Modified and enhanced by Opoint AS (www.opoint.com), (c) 2013
+ * - Uses strict JavaScript now
+ * - Using three equal signs instead of two
+ * - Missing semi colons
+ * - Passes in few additional global variables to closure
+ * - Uses jQuery variable once, $ otherwise
+ * - Normalized document
+ *
+ * Version: 1.0.9.1
+ *
  */
-(function($) {
 
-  jQuery.fn.extend({
+"use strict";
+
+(function(window, Math, parseInt, $) {
+
+  $.fn.extend({
     slimScroll: function(options) {
 
       var defaults = {
@@ -38,14 +51,14 @@
       // do it for every element that matches selector
       this.each(function(){
 
-      var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
-        barHeight, percentScroll, lastScroll,
-        divS = '<div></div>',
-        minBarHeight = 30,
-        releaseScroll = false;
+        var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
+            barHeight, percentScroll, lastScroll,
+            divS = '<div></div>',
+            minBarHeight = 30,
+            releaseScroll = false;
 
         // used in event handlers and for better minification
-        var me = $(this);
+        var dom = this, me = $(dom);
 
         // ensure we are not binding it again
         if (me.parent().hasClass('slimScrollDiv'))
@@ -89,7 +102,7 @@
         }
 
         // optionally set height to the parent's height
-        o.height = (o.height == 'auto') ? me.parent().innerHeight() : o.height;
+        o.height = (o.height === 'auto') ? me.parent().innerHeight() : o.height;
 
         // wrap content
         var wrapper = $(divS)
@@ -141,7 +154,7 @@
           });
 
         // set position
-        var posCss = (o.position == 'right') ? { right: o.distance } : { left: o.distance };
+        var posCss = (o.position === 'right') ? { right: o.distance } : { left: o.distance };
         rail.css(posCss);
         bar.css(posCss);
 
@@ -210,7 +223,7 @@
           }
         });
 
-        var _onWheel = function(e)
+        function _onWheel(e)
         {
           // use mouse wheel only when mouse is over
           if (!isOverPanel) { return; }
@@ -277,18 +290,18 @@
           hideBar();
         }
 
-        var attachWheel = function()
+        function attachWheel()
         {
           if (window.addEventListener)
           {
-            this.addEventListener('DOMMouseScroll', _onWheel, false );
-            this.addEventListener('mousewheel', _onWheel, false );
+            dom.addEventListener('DOMMouseScroll', _onWheel, false);
+            dom.addEventListener('mousewheel', _onWheel, false);
           }
           else
           {
-            document.attachEvent("onmousewheel", _onWheel)
+            window.document.attachEvent("onmousewheel", _onWheel);
           }
-        }
+        };
 
         // attach scroll events
         attachWheel();
@@ -310,15 +323,15 @@
           clearTimeout(queueHide);
 
           // when bar reached top or bottom
-          if (percentScroll == ~~ percentScroll)
+          if (percentScroll === ~~ percentScroll)
           {
             //release wheel
             releaseScroll = o.allowPageScroll;
 
             // publish approporiate event
-            if (lastScroll != percentScroll)
+            if (lastScroll !== percentScroll)
             {
-                var msg = (~~percentScroll == 0) ? 'top' : 'bottom';
+                var msg = (~~percentScroll === 0) ? 'top' : 'bottom';
                 me.trigger('slimscroll', msg);
             }
           }
@@ -350,13 +363,13 @@
         }
 
         // check start position
-        if (o.start == 'bottom')
+        if (o.start === 'bottom')
         {
           // scroll content to bottom
           bar.css({ top: me.outerHeight() - bar.outerHeight() });
           scrollContent(0, true);
         }
-        else if (typeof o.start == 'object')
+        else if (typeof o.start === 'object')
         {
           // scroll content
           scrollContent($(o.start).position().top, null, true);
@@ -371,8 +384,8 @@
     }
   });
 
-  jQuery.fn.extend({
-    slimscroll: jQuery.fn.slimScroll
+  $.fn.extend({
+    slimscroll: $.fn.slimScroll
   });
 
-})(jQuery);
+})(window, Math, parseInt, jQuery);
