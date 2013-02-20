@@ -18,7 +18,8 @@
 
 "use strict";
 
-(function(window, Math, parseInt, $) {
+// used in various places, results in better minification
+(function($, window, Math, parseInt, TRUE, FALSE, CLS_PREFIX) {
 
   $.fn.extend({
     slimScroll: function(options) {
@@ -31,22 +32,27 @@
         color: '#000',
         position : 'right',
         distance : '1px',
+        baseline : '1px',
         start : 'top',
         opacity : .4,
-        alwaysVisible : false,
-        disableFadeOut: false,
-        railVisible : false,
+        alwaysVisible : FALSE,
+        disableFadeOut: FALSE,
+        railVisible : FALSE,
         railColor : '#333',
         railOpacity : '0.2',
-        railClass : 'slimScrollRail',
-        barClass : 'slimScrollBar',
-        wrapperClass : 'slimScrollDiv',
-        allowPageScroll : false,
+        railClass : CLS_PREFIX + 'Rail',
+        barClass : CLS_PREFIX + 'Bar',
+        wrapperClass : CLS_PREFIX + 'Div',
+        allowPageScroll : FALSE,
         scroll : 0,
         touchScrollStep : 200
       };
 
       var o = $.extend(defaults, options);
+      o.distance = '30px';
+      o.baseline = '30px';
+      o.baseline = parseInt(o.baseline);
+      o.padding = 2 * o.baseline;
 
       // do it for every element that matches selector
       this.each(function(){
@@ -55,13 +61,13 @@
             barHeight, percentScroll, lastScroll,
             divS = '<div></div>',
             minBarHeight = 30,
-            releaseScroll = false;
+            releaseScroll = FALSE;
 
         // used in event handlers and for better minification
         var dom = this, me = $(dom);
 
         // ensure we are not binding it again
-        if (me.parent().hasClass('slimScrollDiv'))
+        if (me.parent().hasClass(CLS_PREFIX + 'Div'))
         {
             // start from last bar position
             var offset = me.scrollTop();
@@ -95,7 +101,7 @@
               }
 
               // scroll content by the given offset
-              scrollContent(offset, false, true);
+              scrollContent(offset, FALSE, TRUE);
             }
 
             return;
@@ -126,9 +132,10 @@
           .addClass(o.railClass)
           .css({
             width: o.size,
-            height: '100%',
+//            height: '100%',
             position: 'absolute',
-            top: 0,
+            top: o.baseline + 'px',
+            bottom: o.baseline,
             display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
             'border-radius': o.size,
             background: o.railColor,
@@ -143,7 +150,7 @@
             background: o.color,
             width: o.size,
             position: 'absolute',
-            top: 0,
+            top: o.baseline + 'px',
             opacity: o.opacity,
             display: o.alwaysVisible ? 'block' : 'none',
             'border-radius' : o.size,
@@ -169,12 +176,12 @@
         bar.draggable({
           axis: 'y',
           containment: 'parent',
-          start: function() { isDragg = true; },
-          stop: function() { isDragg = false; hideBar(); },
+          start: function() { isDragg = TRUE; },
+          stop: function() { isDragg = FALSE; hideBar(); },
           drag: function(e)
           {
             // scroll content
-            scrollContent(0, $(this).position().top, false);
+            scrollContent(0, $(this).position().top, FALSE);
           }
         });
 
@@ -187,18 +194,18 @@
 
         // on bar over
         bar.hover(function(){
-          isOverBar = true;
+          isOverBar = TRUE;
         }, function(){
-          isOverBar = false;
+          isOverBar = FALSE;
         });
 
         // show on parent mouseover
         me.hover(function(){
-          isOverPanel = true;
+          isOverPanel = TRUE;
           showBar();
           hideBar();
         }, function(){
-          isOverPanel = false;
+          isOverPanel = FALSE;
           hideBar();
         });
 
@@ -219,7 +226,7 @@
             // see how far user swiped
             var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
             // scroll content
-            scrollContent(diff, true);
+            scrollContent(diff, TRUE);
           }
         });
 
@@ -237,12 +244,12 @@
           var target = e.target || e.srcTarget;
           if ($(target).closest('.' + o.wrapperClass).is(me.parent())) {
             // scroll content
-            scrollContent(delta, true);
+            scrollContent(delta, TRUE);
           }
 
           // stop window scroll
           if (e.preventDefault && !releaseScroll) { e.preventDefault(); }
-          if (!releaseScroll) { e.returnValue = false; }
+          if (!releaseScroll) { e.returnValue = FALSE; }
         }
 
         function scrollContent(y, isWheel, isJump)
@@ -294,8 +301,8 @@
         {
           if (window.addEventListener)
           {
-            dom.addEventListener('DOMMouseScroll', _onWheel, false);
-            dom.addEventListener('mousewheel', _onWheel, false);
+            dom.addEventListener('DOMMouseScroll', _onWheel, FALSE);
+            dom.addEventListener('mousewheel', _onWheel, FALSE);
           }
           else
           {
@@ -340,11 +347,11 @@
           // show only when required
           if(barHeight >= me.outerHeight()) {
             //allow window scroll
-            releaseScroll = true;
+            releaseScroll = TRUE;
             return;
           }
-          bar.stop(true,true).fadeIn('fast');
-          if (o.railVisible) { rail.stop(true,true).fadeIn('fast'); }
+          bar.stop(TRUE, TRUE).fadeIn('fast');
+          if (o.railVisible) { rail.stop(TRUE, TRUE).fadeIn('fast'); }
         }
 
         function hideBar()
@@ -367,12 +374,12 @@
         {
           // scroll content to bottom
           bar.css({ top: me.outerHeight() - bar.outerHeight() });
-          scrollContent(0, true);
+          scrollContent(0, TRUE);
         }
         else if (typeof o.start === 'object')
         {
           // scroll content
-          scrollContent($(o.start).position().top, null, true);
+          scrollContent($(o.start).position().top, null, TRUE);
 
           // make sure bar stays hidden
           if (!o.alwaysVisible) { bar.hide(); }
@@ -388,4 +395,4 @@
     slimscroll: $.fn.slimScroll
   });
 
-})(window, Math, parseInt, jQuery);
+})(jQuery, window, Math, parseInt, !0, !1, 'slimScroll');
