@@ -19,38 +19,40 @@
 "use strict";
 
 // used in various places, results in better minification
-(function($, window, Math, parseInt, TRUE, FALSE, CLS_PREFIX) {
+(function($, window, Math, parseInt, TRUE, FALSE) {
 
   $.fn.extend({
     slimScroll: function(options) {
 
       var defaults = {
-        wheelStep : 20,
-        width : 'auto',
-        height : '250px',
-        size : '7px',
-        color: '#000',
-        position : 'right',
-        distance : '1px',
-        baseline : '1px',
-        start : 'top',
-        opacity : .4,
-        alwaysVisible : FALSE,
-        disableFadeOut: FALSE,
-        railVisible : FALSE,
-        railColor : '#333',
-        railOpacity : '0.2',
-        railClass : CLS_PREFIX + 'Rail',
-        barClass : CLS_PREFIX + 'Bar',
-        wrapperClass : CLS_PREFIX + 'Div',
-        allowPageScroll : FALSE,
-        scroll : 0,
-        touchScrollStep : 200
-      };
+            wheelStep : 20,
+            width : 'auto',
+            height : '250px',
+            size : '7px',
+            color: '#000',
+            position : 'right',
+            distance : '1px',
+            baseline : '1px',
+            start : 'top',
+            opacity : .4,
+            alwaysVisible : FALSE,
+            disableFadeOut: FALSE,
+            railVisible : FALSE,
+            railColor : '#333',
+            railOpacity : '0.2',
+            classPrefix : 'slimScroll',
+            allowPageScroll : FALSE,
+            scroll : 0,
+            touchScrollStep : 200
+          },
 
-      var o = $.extend(defaults, options);
-      o.distance = '30px';
-      o.baseline = '30px';
+          // override defaults with user's options
+          o = $.extend(defaults, options);
+
+      // adjust few more options manually
+      o.railClass = o.classPrefix + 'Rail',
+      o.barClass = o.classPrefix + 'Bar',
+      o.wrapperClass = o.classPrefix + 'Div',
       o.baseline = parseInt(o.baseline);
       o.padding = 2 * o.baseline;
 
@@ -67,7 +69,7 @@
         var dom = this, me = $(dom);
 
         // ensure we are not binding it again
-        if (me.parent().hasClass(CLS_PREFIX + 'Div'))
+        if (me.parent().hasClass(o.classPrefix + 'Div'))
         {
             // start from last bar position
             var offset = me.scrollTop();
@@ -395,4 +397,4 @@
     slimscroll: $.fn.slimScroll
   });
 
-})(jQuery, window, Math, parseInt, !0, !1, 'slimScroll');
+})(jQuery, window, Math, parseInt, !0, !1);
