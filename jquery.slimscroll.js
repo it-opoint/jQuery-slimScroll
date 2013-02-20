@@ -38,12 +38,15 @@
             alwaysVisible : FALSE,
             disableFadeOut: FALSE,
             railVisible : FALSE,
+            enableTouch : TRUE,
+            enableWheel : TRUE,
             railColor : '#333',
             railOpacity : '0.2',
             classPrefix : 'slimScroll',
             allowPageScroll : FALSE,
             scroll : 0,
-            touchScrollStep : 200
+            touchScrollStep : 200,
+            hideDelay : 1000
           },
 
           // override defaults with user's options
@@ -54,6 +57,7 @@
       o.barClass = o.classPrefix + 'Bar',
       o.wrapperClass = o.classPrefix + 'Div',
       o.baseline = parseInt(o.baseline);
+      o.baselinePx = o.baseline + 'px';
       o.padding = 2 * o.baseline;
 
       // do it for every element that matches selector
@@ -134,10 +138,9 @@
           .addClass(o.railClass)
           .css({
             width: o.size,
-//            height: '100%',
             position: 'absolute',
-            top: o.baseline + 'px',
-            bottom: o.baseline,
+            top: o.baselinePx,
+            bottom: o.baselinePx,
             display: (o.alwaysVisible && o.railVisible) ? 'block' : 'none',
             'border-radius': o.size,
             background: o.railColor,
@@ -152,7 +155,7 @@
             background: o.color,
             width: o.size,
             position: 'absolute',
-            top: o.baseline + 'px',
+            top: o.baselinePx,
             opacity: o.opacity,
             display: o.alwaysVisible ? 'block' : 'none',
             'border-radius' : o.size,
@@ -212,25 +215,28 @@
         });
 
         // support for mobile
-        me.bind('touchstart', function(e,b){
-          if (e.originalEvent.touches.length)
-          {
-            // record where touch started
-            touchDif = e.originalEvent.touches[0].pageY;
-          }
-        });
+        if (o.enableTouch)
+        {
+          me.bind('touchstart', function(e,b){
+            if (e.originalEvent.touches.length)
+            {
+              // record where touch started
+              touchDif = e.originalEvent.touches[0].pageY;
+            }
+          });
 
-        me.bind('touchmove', function(e){
-          // prevent scrolling the page
-          e.originalEvent.preventDefault();
-          if (e.originalEvent.touches.length)
-          {
-            // see how far user swiped
-            var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
-            // scroll content
-            scrollContent(diff, TRUE);
-          }
-        });
+          me.bind('touchmove', function(e){
+            // prevent scrolling the page
+            e.originalEvent.preventDefault();
+            if (e.originalEvent.touches.length)
+            {
+              // see how far user swiped
+              var diff = (touchDif - e.originalEvent.touches[0].pageY) / o.touchScrollStep;
+              // scroll content
+              scrollContent(diff, TRUE);
+            }
+          });
+        }
 
         function _onWheel(e)
         {
@@ -299,7 +305,8 @@
           hideBar();
         }
 
-        function attachWheel()
+        // attach scroll events
+        if (o.enableWheel)
         {
           if (window.addEventListener)
           {
@@ -308,12 +315,9 @@
           }
           else
           {
-            window.document.attachEvent("onmousewheel", _onWheel);
+            window.document.attachEvent('onmousewheel', _onWheel);
           }
-        };
-
-        // attach scroll events
-        attachWheel();
+        }
 
         function getBarHeight()
         {
@@ -367,7 +371,7 @@
                 bar.fadeOut('slow');
                 rail.fadeOut('slow');
               }
-            }, 1000);
+            }, o.hideDelay);
           }
         }
 
