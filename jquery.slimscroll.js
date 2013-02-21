@@ -4,7 +4,7 @@
  *
  * Version: 1.0.9
  *
- *! Modified and enhanced by Opoint AS (www.opoint.com), (c) 2013
+ * Modified and enhanced by Opoint AS (www.opoint.com), (c) 2013
  *
  * - Uses strict JavaScript;
  * - Using three equal signs instead of two (removes warnings in NetBeans);
