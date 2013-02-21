@@ -18,7 +18,7 @@
  * - Added vertical distance (baseline) support
  * - Added support for glowing border around rail
  *
- * Version: 1.0.9.2
+ * Version: 1.0.9.3
  *
  */
 
@@ -167,8 +167,8 @@
             reuseable = me.scrollTop();
 
             // find bar and rail
-            rail = me.parent().find('.slimScrollRail');
-            bar = me.parent().find('.slimScrollBar');
+            rail = me.parent().find('.' + config.classPrefix + 'Rail');
+            bar = me.parent().find('.' + config.classPrefix + 'Bar');
 
             getBarHeight();
 
