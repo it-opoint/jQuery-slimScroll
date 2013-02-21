@@ -31,21 +31,21 @@ In order to simplify the positioning of the rail and scrollbar components, a new
 
 The used DOM structure of the original slimScroll is like this:
 
-  <div class="slimScrollDiv">
-    <!-- original DOM element appears here -->
-    <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
-    <div class="slimScrollRail"><!-- slimScroll's rail element is here --></div>
-  </div>
+  &lt;div class="slimScrollDiv"&rt;
+    &lt;div!-- original DOM element appears here --&rt;
+    &lt;div class="slimScrollBar"&rt;&lt;!-- slimScroll's scrollbar element is here --&rt;&lt;/div&rt;
+    &lt;div class="slimScrollRail"&rt;&lt;!-- slimScroll's rail element is here --&rt;&lt;div
+  &lt;/div&rt;
 
 The new DOM structure in this fork is like this:
 
-  <div class="slimScrollDiv">
-    <!-- original DOM element appears here -->
-    <div class="slimScrollRailDiv">
-      <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
-      <div class="slimScrollRail"><!-- slimScroll's rail element is here --></div>
-    </div>
-  </div>
+  &lt;div class=&quot;slimScrollDiv&quot;&rt;
+    &lt;!-- original DOM element appears here --&rt;
+    &lt;div class=&quot;slimScrollRailDiv&quot;&rt;
+      &lt;div class=&quot;slimScrollBar&quot;&rt;&lt;!-- slimScroll's scrollbar element is here --&rt;&lt;/div&rt;
+      &lt;div class=&quot;slimScrollRail&quot;&rt;&lt;!-- slimScroll's rail element is here --&rt;&lt;/div&rt;
+    &lt;/div&rt;
+  &lt;/div&rt;
 
 As you can see, a new DOM element has been added which wraps both the rail and the scrollbar. This simplified a lot of calculations and CSS, and made adding a vertical padding an easy job).
 
