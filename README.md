@@ -4,7 +4,7 @@ slimScroll is a small jQuery plugin that transforms any div into a scrollable ar
 
 Demo and more: http://rocha.la/jQuery-slimScroll
 
-Copyright (c) 2011 Piotr Rochala (http://rocha.la)
+Copyright (c) 2011 Piotr Rochala (http://rocha.la)  
 Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
 
 # What has been enhanced in the fork by Opoint?
@@ -47,7 +47,7 @@ In order to simplify the positioning of the rail and scrollbar components, a new
       </div>
     </div>
 
-As you can see, a new DOM element has been added which wraps both the rail and the scrollbar. This simplified a lot of calculations and CSS, and made adding a vertical padding an easy job).
+As you can see, a new DOM element has been added which wraps both the rail and the scrollbar. This simplified a lot of calculations and CSS, and made adding vertical padding (baseline) an easy job.
 
-Copyright (c) 2013 Opoint AS (http://www.opoint.com)
+Copyright (c) 2013 Opoint AS (http://www.opoint.com)  
 Retains the same original license restrictions as original slimScroll
