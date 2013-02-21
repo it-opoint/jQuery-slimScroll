@@ -42,8 +42,8 @@ In order to simplify the positioning of the rail and scrollbar components, a new
     <div class="slimScrollDiv">
       <!-- original DOM element appears here -->
       <div class="slimScrollRailDiv">
-        <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
         <div class="slimScrollRail"><!-- slimScroll's rail element is here --></div>
+        <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
       </div>
     </div>
 
