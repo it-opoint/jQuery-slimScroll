@@ -29,23 +29,23 @@ The following new features have been successfully (through testing) added to sli
 
 In order to simplify the positioning of the rail and scrollbar components, a new DOM structure has been used. This means that this fork is not fully backward-compatible with the original slimScroll, but we believe that the benefits outweigh the drawbacks, by a distance!
 
-The used DOM structure of the original slimScroll is like this:
+**The used DOM structure of the original slimScroll is like this**:
 
-  &lt;div class="slimScrollDiv"&rt;
-    &lt;div!-- original DOM element appears here --&rt;
-    &lt;div class="slimScrollBar"&rt;&lt;!-- slimScroll's scrollbar element is here --&rt;&lt;/div&rt;
-    &lt;div class="slimScrollRail"&rt;&lt;!-- slimScroll's rail element is here --&rt;&lt;div
-  &lt;/div&rt;
+    <div class="slimScrollDiv">
+      <!-- original DOM element appears here -->
+      <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
+      <div class="slimScrollRail"><!-- slimScroll's rail element is here --></div>
+    </div>
 
-The new DOM structure in this fork is like this:
+**The new DOM structure in this fork is like this**:
 
-  &lt;div class=&quot;slimScrollDiv&quot;&rt;
-    &lt;!-- original DOM element appears here --&rt;
-    &lt;div class=&quot;slimScrollRailDiv&quot;&rt;
-      &lt;div class=&quot;slimScrollBar&quot;&rt;&lt;!-- slimScroll's scrollbar element is here --&rt;&lt;/div&rt;
-      &lt;div class=&quot;slimScrollRail&quot;&rt;&lt;!-- slimScroll's rail element is here --&rt;&lt;/div&rt;
-    &lt;/div&rt;
-  &lt;/div&rt;
+    <div class="slimScrollDiv">
+      <!-- original DOM element appears here -->
+      <div class="slimScrollRailDiv">
+        <div class="slimScrollBar"><!-- slimScroll's scrollbar element is here --></div>
+        <div class="slimScrollRail"><!-- slimScroll's rail element is here --></div>
+      </div>
+    </div>
 
 As you can see, a new DOM element has been added which wraps both the rail and the scrollbar. This simplified a lot of calculations and CSS, and made adding a vertical padding an easy job).
 
