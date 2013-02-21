@@ -5,18 +5,18 @@
  * Version: 1.0.9
  *
  *! Modified and enhanced by Opoint AS (www.opoint.com), (c) 2013
- * - Uses strict JavaScript now
- * - Using three equal signs instead of two
- * - Missing semi colons
- * - Passes in few additional global variables to closure
- * - Uses jQuery variable once, $ otherwise
- * - Normalized document
- * - Opt-in to using touch/mouse wheel
- * - Set hide/fade delay time
- * - Configurable class name
- * - Support to showing scrollbar when mouse moves
- * - Added vertical distance (baseline) support
- * - Added support for glowing border around rail
+ *
+ * - Uses strict JavaScript;
+ * - Using three equal signs instead of two (removes warnings in NetBeans);
+ * - Passes in few additional global variables to main closure for better minification;
+ * - Uses jQuery variable once through the main closure and $ otherwise;
+ * - Normalized DOM's document object;
+ * - Opt-in to using touch/mouse wheel (touch can be turned off if needed);
+ * - Set hide/fade delay time;
+ * - Configurable class name prefix (defaults to 'slimScroll');
+ * - Support to showing scrollbar when mouse moves while inside target area;
+ * - Added vertical distance (baseline) support;
+ * - Added support for glowing border around rail.
  *
  * Version: 1.0.9.3
  *
