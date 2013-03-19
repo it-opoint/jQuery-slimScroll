@@ -123,7 +123,6 @@
               .addClass(config.railWrapperClass)
               .css({
                 position: 'absolute',
-                overflow: 'hidden',
                 width: config.size,
                 top: config.baseline,
                 bottom: config.baseline,
@@ -363,14 +362,16 @@
           }
         }
 
-        function scrollContent(y, isWheel, isJump)
+        function scrollContent(yPos, isWheel, isJump)
         {
-          var delta = y, maxTop = railW.outerHeight() - bar.outerHeight();
+          var delta = yPos,
+              railWH = railW.outerHeight(),
+              maxTop = Math.max(0, railWH - bar.outerHeight());
 
           if (isWheel)
           {
             // move bar with mouse wheel
-            delta = parseInt(bar.css('top')) + y * parseInt(config.wheelStep) / 100 * railW.outerHeight();
+            delta = parseInt(bar.css('top')) + yPos * parseInt(config.wheelStep) / 100 * railWH;
 
             // move bar, make sure it doesn't go out
             delta = Math.min(Math.max(delta, 0), maxTop);
@@ -379,7 +380,7 @@
             // scroll position isn't rounded away when the scrollbar's CSS is set
             // this flooring of delta would happened automatically when
             // bar.css is set below, but we floor here for clarity
-            delta = (y > 0) ? Math.ceil(delta) : Math.floor(delta);
+            delta = (yPos > 0) ? Math.ceil(delta) : Math.floor(delta);
 
             // scroll the scrollbar
             bar.css({ top: delta + 'px' });
@@ -391,7 +392,7 @@
 
           if (isJump)
           {
-            delta = y;
+            delta = yPos;
             var offsetTop = delta / me[0].scrollHeight * me.outerHeight();
             offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
             bar.css({ top: offsetTop + 'px' });
