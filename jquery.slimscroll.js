@@ -103,6 +103,7 @@
             barHeight, percentScroll, lastScroll,
             minBarHeight = 30,
             releaseScroll = FALSE,
+            scrollTo,
             variable,
 
             // used in event handlers and for better minification
@@ -112,6 +113,7 @@
             wrapper = $(divS)
               .addClass(config.wrapperClass)
               .css({
+                display: 'block',
                 position: 'relative',
                 overflow: 'hidden',
                 width: config.width,
@@ -122,6 +124,7 @@
             railW = $(divS)
               .addClass(config.railWrapperClass)
               .css({
+                display: 'block',
                 position: 'absolute',
                 width: config.size,
                 top: config.baseline,
@@ -134,12 +137,12 @@
             rail  = $(divS)
               .addClass(config.railClass)
               .css({
+                display: (config.alwaysVisible && config.railVisible) ? 'block' : 'none',
                 position: 'absolute',
                 top: 0,
                 bottom: 0,
                 left: 0,
                 right: 0,
-                display: (config.alwaysVisible && config.railVisible) ? 'block' : 'none',
                 background: config.railColor,
                 opacity: config.railOpacity,
                 zIndex: 95
@@ -149,13 +152,13 @@
             bar = $(divS)
               .addClass(config.barClass)
               .css({
+                display: config.alwaysVisible ? 'block' : 'none',
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
                 background: config.color,
                 opacity: config.opacity,
-                display: config.alwaysVisible ? 'block' : 'none',
                 zIndex: 99
               });
 
@@ -163,7 +166,7 @@
         if (me.parent().hasClass(config.classPrefix + 'Div'))
         {
             // start from last bar position
-            variable = me.scrollTop();
+            scrollTo = me.scrollTop();
 
             // find bar and rail
             rail = me.parent().find('.' + config.classPrefix + 'Rail');
@@ -176,25 +179,30 @@
             {
               if ('scrollTo' in options)
               {
-                // jump to a static point
-                variable = parseInt(config.scrollTo);
+                // jump to a static point (DOM node or numeric)
+                variable = typeof config.scrollTo;
+                if ('number' === variable || ('string' === variable && /^\d+(\.\d+)?px?$/.test(variable)))
+                  scrollTo = parseInt(config.scrollTo);
+                else
+                  scrollTo = getPreferredScrollPos(scrollTo, $(config.scrollTo, me));
               }
               else if ('scrollBy' in options)
               {
                 // jump by value pixels
-                variable += parseInt(config.scrollBy);
+                scrollTo += parseInt(config.scrollBy);
               }
               else if ('destroy' in options)
               {
                 // remove slimscroll elements
                 bar.remove();
                 rail.remove();
+                railW.remove();
                 me.unwrap();
                 return;
               }
 
               // scroll content by the given offset
-              scrollContent(variable, FALSE, TRUE);
+              scrollContent(scrollTo, FALSE, TRUE);
             }
 
             return;
@@ -362,11 +370,16 @@
           }
         }
 
+        function getRailWrapperHeight()
+        {
+          return Math.max(railW.outerHeight(), me.outerHeight() - 2 * config.baseline);
+        }
+
         function scrollContent(yPos, isWheel, isJump)
         {
-          var delta = yPos,
-              railWH = railW.outerHeight(),
-              maxTop = Math.max(0, railWH - bar.outerHeight());
+          var railWH = getRailWrapperHeight(),
+              maxTop = Math.max(0, railWH - bar.outerHeight()),
+              delta;
 
           if (isWheel)
           {
@@ -393,9 +406,9 @@
           if (isJump)
           {
             delta = yPos;
-            var offsetTop = delta / me[0].scrollHeight * me.outerHeight();
+            var offsetTop = delta / me[0].scrollHeight * railWH;
             offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
-            bar.css({ top: offsetTop + 'px' });
+            bar.css({top: offsetTop + 'px'});
           }
 
           // scroll content
@@ -422,15 +435,39 @@
           }
         }
 
+        function getPreferredScrollPos(scrollTop, targetEl)
+        {
+          if(0 < targetEl.length)
+          {
+            // Take only one item, if more than one matches.
+            if(1 < targetEl.length)
+              targetEl = $(targetEl[0]);
+
+            // Calculate preferred position.
+            scrollTop += targetEl.position().top;
+            if(0 > scrollTop)
+              scrollTop = 0;
+          }
+          return scrollTop;
+        }
+
         function getBarHeight()
         {
           // calculate scrollbar height and make sure it is not too small
-          barHeight = Math.max((me.outerHeight() / me[0].scrollHeight) * railW.outerHeight(), minBarHeight);
-          bar.css({ height: barHeight + 'px' });
+          barHeight = Math.max((me.outerHeight() / me[0].scrollHeight) * getRailWrapperHeight(), minBarHeight);
+          bar.css({height: barHeight + 'px'});
         }
 
         // set up initial height
         getBarHeight();
+
+        function hideRailWrapper() {
+          railW.css({visibility: 'hidden'});
+        }
+
+        function showRailWrapper() {
+          railW.css({visibility: 'visible'});
+        }
 
         function showBar()
         {
@@ -459,20 +496,22 @@
           lastScroll = percentScroll;
 
           // show only when required
-          if(barHeight >= railW.outerHeight()) {
+          if(barHeight >= getRailWrapperHeight())
+          {
             //allow window scroll
             releaseScroll = TRUE;
-            return;
           }
-
-          if (config.railVisible)
+          else
           {
-            rail.stop(TRUE, TRUE).fadeIn(config.fadeDelay);
+            if (config.railVisible)
+            {
+              rail.stop(TRUE, TRUE).fadeIn(config.fadeDelay);
+            }
+            bar.stop(TRUE, TRUE).fadeIn(config.fadeDelay);
           }
-          bar.stop(TRUE, TRUE).fadeIn(config.fadeDelay);
 
           // show the rail wrapper
-          railW.show();
+          showRailWrapper();
         }
 
         function hideBar()
@@ -488,7 +527,7 @@
                 {
                   rail.fadeOut(config.fadeDelay);
                 }
-                bar.fadeOut(config.fadeDelay);
+                bar.fadeOut(config.fadeDelay, hideRailWrapper);
               }
             }, config.hideDelay);
           }
@@ -498,7 +537,7 @@
         if (config.start === 'bottom')
         {
           // scroll content to bottom
-          bar.css({ top: railW.outerHeight() - bar.outerHeight() });
+          bar.css({ top: getRailWrapperHeight() - bar.outerHeight() });
           scrollContent(0, TRUE);
         }
         else if (typeof config.start === 'object')
@@ -516,7 +555,7 @@
         // make sure rail wrapper starts up hidden
         if (!config.alwaysVisible && !config.railVisible)
         {
-          railW.hide();
+          hideRailWrapper();
         }
       });
 
