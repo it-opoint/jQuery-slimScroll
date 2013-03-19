@@ -103,7 +103,7 @@
             barHeight, percentScroll, lastScroll,
             minBarHeight = 30,
             releaseScroll = FALSE,
-            reuseable,
+            variable,
 
             // used in event handlers and for better minification
             dom = this, me = $(dom),
@@ -164,7 +164,7 @@
         if (me.parent().hasClass(config.classPrefix + 'Div'))
         {
             // start from last bar position
-            reuseable = me.scrollTop();
+            variable = me.scrollTop();
 
             // find bar and rail
             rail = me.parent().find('.' + config.classPrefix + 'Rail');
@@ -178,12 +178,12 @@
               if ('scrollTo' in options)
               {
                 // jump to a static point
-                reuseable = parseInt(config.scrollTo);
+                variable = parseInt(config.scrollTo);
               }
               else if ('scrollBy' in options)
               {
                 // jump by value pixels
-                reuseable += parseInt(config.scrollBy);
+                variable += parseInt(config.scrollBy);
               }
               else if ('destroy' in options)
               {
@@ -195,7 +195,7 @@
               }
 
               // scroll content by the given offset
-              scrollContent(reuseable, FALSE, TRUE);
+              scrollContent(variable, FALSE, TRUE);
             }
 
             return;
@@ -205,9 +205,9 @@
           // set border radius for rail and scrollbar
           if(parseInt(config.size) > 0)
           {
-            reuseable = getExtendedCSS('border-radius', config.size);
-            rail.css(reuseable);
-            bar.css(reuseable);
+            variable = getExtendedCSS('border-radius', config.size);
+            rail.css(variable);
+            bar.css(variable);
           }
 
           // check if a glow should be added too
