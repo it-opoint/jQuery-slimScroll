@@ -99,7 +99,7 @@
       // do it for every element that matches selector
       this.each(function(){
 
-        var isOverPanel, isOverBar, isDragg, queueHide, touchDif,
+        var isOverPanel, isOverRail, isOverBar, isDragg, queueHide, touchDif,
             barHeight, percentScroll, lastScroll,
             minBarHeight = 30,
             releaseScroll = FALSE,
@@ -286,8 +286,10 @@
           // on rail over
           rail.hover(function(){
             showBar();
+            isOverRail = config.railVisible;
           }, function(){
             hideBar();
+            isOverRail = FALSE;
           });
 
           // on bar over
@@ -537,7 +539,7 @@
           {
             queueHide = setTimeout(function() {
               queueHide = NULL;
-              if (!(config.disableFadeOut && isOverPanel) && !isOverBar && !isDragg)
+              if (!(config.disableFadeOut && isOverPanel) && !isOverRail && !isOverBar && !isDragg)
               {
                 if (config.railVisible)
                 {
