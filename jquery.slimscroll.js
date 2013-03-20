@@ -197,6 +197,7 @@
                 bar.remove();
                 rail.remove();
                 railW.remove();
+                me.unbind();
                 me.unwrap();
 
                 // detach scroll events
