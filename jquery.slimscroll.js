@@ -198,6 +198,21 @@
                 rail.remove();
                 railW.remove();
                 me.unwrap();
+
+                // detach scroll events
+                if (config.enableWheel)
+                {
+                  if (window.removeEventListener)
+                  {
+                    dom.removeEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
+                    dom.removeEventListener('mousewheel', mouseWheelHandler, FALSE);
+                  }
+                  else
+                  {
+                    window.document.detachEvent('onmousewheel', mouseWheelHandler);
+                  }
+                }
+
                 return;
               }
 
