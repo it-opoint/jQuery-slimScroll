@@ -278,23 +278,6 @@
           }
         );
 
-        // make scrollbar draggable
-        bar.draggable({
-          axis: 'y',
-          containment: 'parent',
-          start: function(){
-            isDragg = TRUE;
-          },
-          stop: function(){
-            isDragg = FALSE;
-            hideBar();
-          },
-          drag: function(e){
-            // scroll content
-            scrollContent(0, FALSE, FALSE);
-          }
-        });
-
         function mouseWheelHandler(e)
         {
           // use mouse wheel only when mouse is over
@@ -333,11 +316,29 @@
         }
 
         function attachMouseEvents() {
+          // make scrollbar draggable
+          try { bar.draggable('destroy'); } catch (ignored) { }
+          bar.draggable({
+            axis: 'y',
+            containment: 'parent',
+            start: function(){
+              isDragg = TRUE;
+            },
+            stop: function(){
+              isDragg = FALSE;
+              hideBar();
+            },
+            drag: function(e){
+              // scroll content
+              scrollContent(0, FALSE, FALSE);
+            }
+          });
+
           // attach events when not requested to show rail always.
           if (!config.alwaysVisible)
           {
             // on rail over
-            rail.unbind('mouseenter mouseleave');
+            try { rail.unbind('mouseenter mouseleave'); } catch (ignored) { }
             rail.hover(function(){
               showBar();
               isOverRail = config.railVisible;
@@ -347,7 +348,7 @@
             });
 
             // on bar over
-            bar.unbind('mouseenter mouseleave');
+            try { bar.unbind('mouseenter mouseleave'); } catch (ignored) { }
             bar.hover(function(){
               isOverBar = TRUE;
             }, function(){
@@ -355,7 +356,7 @@
             });
 
             // show on parent mouseover
-            me.unbind('mouseenter mouseleave');
+            try { me.unbind('mouseenter mouseleave'); } catch (ignored) { }
             me.hover(function(){
               isOverPanel = TRUE;
               showBar();
@@ -369,7 +370,7 @@
             if (config.mouseSensitive)
             {
               // show on mouseover
-              me.unbind('mousemove');
+              try { me.unbind('mousemove'); } catch (ignored) { }
               me.mousemove(function(){
                 isOverPanel = TRUE;
                 showBar();
@@ -377,7 +378,7 @@
               });
 
               // hide on mouseleave
-              me.unbind('mouseleave');
+              try { me.unbind('mouseleave'); } catch (ignored) { }
               me.mouseleave(function(){
                 isOverPanel = FALSE;
                 hideBar();
@@ -390,14 +391,14 @@
           {
             if (window.addEventListener)
             {
-              dom.removeEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
+              try { dom.removeEventListener('DOMMouseScroll', mouseWheelHandler, FALSE); } catch (ignored) { }
               dom.addEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
-              dom.removeEventListener('mousewheel', mouseWheelHandler, FALSE);
+              try { dom.removeEventListener('mousewheel', mouseWheelHandler, FALSE); } catch (ignored) { }
               dom.addEventListener('mousewheel', mouseWheelHandler, FALSE);
             }
             else
             {
-              document.detachEvent('onmousewheel', mouseWheelHandler);
+              try { document.detachEvent('onmousewheel', mouseWheelHandler); } catch (ignored) { }
               document.attachEvent('onmousewheel', mouseWheelHandler);
             }
           }
