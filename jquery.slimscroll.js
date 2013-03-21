@@ -159,12 +159,12 @@
               // Set new HTML inside scroller.
               if ('innerHTML' in options || 'html' in options)
               {
+                me.html(options['innerHTML'] || options['html']);
+
                 // Setting new HTML unbinds all events on the DOM element,
                 // and also its children. See:
                 // http://friendlybit.com/js/manipulating-innerhtml-removes-events/
-                me.html(options['innerHTML'] || options['html']);
-                if (!config.alwaysVisible)
-                  attachMouseEvents();
+                attachMouseEvents();
               }
               if ('scrollTo' in options)
               {
@@ -295,81 +295,6 @@
           }
         });
 
-        function attachMouseEvents() {
-          // show on parent mouseover
-          me.hover(function(){
-            isOverPanel = TRUE;
-            showBar();
-            hideBar();
-          }, function(){
-            isOverPanel = FALSE;
-            hideBar();
-          });
-
-          // show/hide scrollbar when mouse moves?
-          if (config.mouseSensitive)
-          {
-            // show on mouseover
-            me.mousemove(function(){
-              isOverPanel = TRUE;
-              showBar();
-              hideBar();
-            });
-
-            // hide on mouseleave
-            me.mouseleave(function(){
-              isOverPanel = FALSE;
-              hideBar();
-            });
-          }
-        }
-
-        // attach events when not requested to show rail always.
-        if (!config.alwaysVisible)
-        {
-          // on rail over
-          rail.hover(function(){
-            showBar();
-            isOverRail = config.railVisible;
-          }, function(){
-            hideBar();
-            isOverRail = FALSE;
-          });
-
-          // on bar over
-          bar.hover(function(){
-            isOverBar = TRUE;
-          }, function(){
-            isOverBar = FALSE;
-          });
-
-          attachMouseEvents();
-        }
-
-        // support for mobile
-        if (config.enableTouch)
-        {
-          me.bind('touchstart', function(e,b){
-            if (e.originalEvent.touches.length)
-            {
-              // record where touch started
-              touchDif = e.originalEvent.touches[0].pageY;
-            }
-          });
-
-          me.bind('touchmove', function(e){
-            // prevent scrolling the page
-            e.originalEvent.preventDefault();
-            if (e.originalEvent.touches.length)
-            {
-              // see how far user swiped
-              var diff = (touchDif - e.originalEvent.touches[0].pageY) / config.touchScrollStep;
-              // scroll content
-              scrollContent(diff, TRUE);
-            }
-          });
-        }
-
         function mouseWheelHandler(e)
         {
           // use mouse wheel only when mouse is over
@@ -405,6 +330,103 @@
           {
             e.returnValue = FALSE;
           }
+        }
+
+        function attachMouseEvents() {
+          // attach events when not requested to show rail always.
+          if (!config.alwaysVisible)
+          {
+            // on rail over
+            rail.unbind('mouseenter mouseleave');
+            rail.hover(function(){
+              showBar();
+              isOverRail = config.railVisible;
+            }, function(){
+              hideBar();
+              isOverRail = FALSE;
+            });
+
+            // on bar over
+            bar.unbind('mouseenter mouseleave');
+            bar.hover(function(){
+              isOverBar = TRUE;
+            }, function(){
+              isOverBar = FALSE;
+            });
+
+            // show on parent mouseover
+            me.unbind('mouseenter mouseleave');
+            me.hover(function(){
+              isOverPanel = TRUE;
+              showBar();
+              hideBar();
+            }, function(){
+              isOverPanel = FALSE;
+              hideBar();
+            });
+
+            // show/hide scrollbar when mouse moves?
+            if (config.mouseSensitive)
+            {
+              // show on mouseover
+              me.unbind('mousemove');
+              me.mousemove(function(){
+                isOverPanel = TRUE;
+                showBar();
+                hideBar();
+              });
+
+              // hide on mouseleave
+              me.unbind('mouseleave');
+              me.mouseleave(function(){
+                isOverPanel = FALSE;
+                hideBar();
+              });
+            }
+          }
+
+          // attach scroll events
+          if (config.enableWheel)
+          {
+            if (window.addEventListener)
+            {
+              dom.removeEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
+              dom.addEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
+              dom.removeEventListener('mousewheel', mouseWheelHandler, FALSE);
+              dom.addEventListener('mousewheel', mouseWheelHandler, FALSE);
+            }
+            else
+            {
+              document.detachEvent('onmousewheel', mouseWheelHandler);
+              document.attachEvent('onmousewheel', mouseWheelHandler);
+            }
+          }
+        }
+
+        attachMouseEvents();
+
+        // support for mobile
+        if (config.enableTouch)
+        {
+          me.bind('touchstart', function(e,b){
+            if (e.originalEvent.touches.length)
+            {
+              // record where touch started
+              touchDif = e.originalEvent.touches[0].pageY;
+            }
+          });
+
+          me.bind('touchmove', function(e){
+            // prevent scrolling the page
+            e.originalEvent.preventDefault();
+            if (e.originalEvent.touches.length)
+            {
+              // see how far user swiped
+              var diff = (touchDif - e.originalEvent.touches[0].pageY) / config.touchScrollStep;
+              // scroll content
+              scrollContent(diff, TRUE);
+            }
+          });
         }
 
         function getRailWrapper()
@@ -462,20 +484,6 @@
 
           // trigger hide when scroll is stopped
           hideBar();
-        }
-
-        // attach scroll events
-        if (config.enableWheel)
-        {
-          if (window.addEventListener)
-          {
-            dom.addEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
-            dom.addEventListener('mousewheel', mouseWheelHandler, FALSE);
-          }
-          else
-          {
-            document.attachEvent('onmousewheel', mouseWheelHandler);
-          }
         }
 
         function getPreferredScrollPos(scrollTop, targetEl)
