@@ -87,7 +87,10 @@
         css['-o-' + entity]      =
         css[entity]              = value;
         return css;
-      };
+      },
+
+      // Normalize document.
+      document = window.document;
 
   // extend jQuery's prototype and define slimScroll.
   $.fn.extend({
@@ -108,30 +111,6 @@
 
             // used in event handlers and for better minification
             dom = this, me = $(dom),
-
-            // wrap content
-            wrapper = $(divS)
-              .addClass(config.wrapperClass)
-              .css({
-                display: 'block',
-                position: 'relative',
-                overflow: 'hidden',
-                width: config.width,
-                height: config.height
-              }),
-
-            // rail+scrollbar wrapper
-            railW = $(divS)
-              .addClass(config.railWrapperClass)
-              .css({
-                display: 'block',
-                position: 'absolute',
-                width: config.size,
-                top: config.baseline,
-                bottom: config.baseline,
-                background: 'transparent none',
-                zIndex: 90
-              }),
 
             // create scrollbar rail
             rail  = $(divS)
@@ -204,9 +183,7 @@
               else if ('destroy' in options)
               {
                 // remove slimscroll elements
-                bar.remove();
-                rail.remove();
-                railW.remove();
+                getRailWrapper().remove();
                 me.unbind();
                 me.unwrap();
 
@@ -220,7 +197,7 @@
                   }
                   else
                   {
-                    window.document.detachEvent('onmousewheel', mouseWheelHandler);
+                    document.detachEvent('onmousewheel', mouseWheelHandler);
                   }
                 }
 
@@ -260,18 +237,46 @@
           height: config.height
         });
 
-        // set rail wrapper position
-        railW.css((config.position === 'right') ? { right: config.distance } : { left: config.distance });
-
         // wrap target (this) DOM element
-        me.wrap(wrapper);
+        (function(wrapper) {
+          // wrap content
+          wrapper.addClass(config.wrapperClass);
+          wrapper.css({
+            display: 'block',
+            position: 'relative',
+            overflow: 'hidden',
+            width: config.width,
+            height: config.height
+          });
+          me.wrap(wrapper);
+        })($(divS));
 
-        // append rail and scrollbar to the rail wrapper
-        railW.append(rail);
-        railW.append(bar);
+        // set up a rail wrapper to hold scrollbar and rail
+        (function(railW, css) {
+          // set rail wrapper position
+          css[config.position === 'right' ? 'right' : 'left'] = config.distance;
 
-        // append rail wrapper to parent div
-        me.parent().append(railW);
+          railW.addClass(config.railWrapperClass);
+          railW.css(css);
+
+          // append rail and scrollbar to the rail wrapper
+          railW.append(rail);
+          railW.append(bar);
+
+          // append rail wrapper to parent div
+          me.parent().append(railW);
+        })(
+          $(divS),
+          {
+            display: 'block',
+            position: 'absolute',
+            width: config.size,
+            top: config.baseline,
+            bottom: config.baseline,
+            background: 'transparent none',
+            zIndex: 90
+          }
+        );
 
         // make scrollbar draggable
         bar.draggable({
@@ -402,9 +407,15 @@
           }
         }
 
+        function getRailWrapper()
+        {
+          // The rail wrapper appears always after the target DOM element.
+          return me.next();
+        }
+
         function getRailWrapperHeight()
         {
-          return Math.max(railW.outerHeight(), me.outerHeight() - 2 * config.baseline);
+          return Math.max(getRailWrapper().outerHeight(), me.outerHeight() - 2 * config.baseline);
         }
 
         function scrollContent(yPos, isWheel, isJump)
@@ -463,7 +474,7 @@
           }
           else
           {
-            window.document.attachEvent('onmousewheel', mouseWheelHandler);
+            document.attachEvent('onmousewheel', mouseWheelHandler);
           }
         }
 
@@ -494,11 +505,11 @@
         getBarHeight();
 
         function hideRailWrapper() {
-          railW.css({visibility: 'hidden'});
+          getRailWrapper().css({visibility: 'hidden'});
         }
 
         function showRailWrapper() {
-          railW.css({visibility: 'visible'});
+          getRailWrapper().css({visibility: 'visible'});
         }
 
         function showBar()
