@@ -177,6 +177,16 @@
             // check if we should scroll existing instance
             if (options)
             {
+              // Set new HTML inside scroller.
+              if ('innerHTML' in options || 'html' in options)
+              {
+                // Setting new HTML unbinds all events on the DOM element,
+                // and also its children. See:
+                // http://friendlybit.com/js/manipulating-innerhtml-removes-events/
+                me.html(options['innerHTML'] || options['html']);
+                if (!config.alwaysVisible)
+                  attachMouseEvents();
+              }
               if ('scrollTo' in options)
               {
                 // jump to a static point (DOM node or numeric)
@@ -280,25 +290,7 @@
           }
         });
 
-        // attach events when not requested to show rail always.
-        if (!config.alwaysVisible)
-        {
-          // on rail over
-          rail.hover(function(){
-            showBar();
-            isOverRail = config.railVisible;
-          }, function(){
-            hideBar();
-            isOverRail = FALSE;
-          });
-
-          // on bar over
-          bar.hover(function(){
-            isOverBar = TRUE;
-          }, function(){
-            isOverBar = FALSE;
-          });
-
+        function attachMouseEvents() {
           // show on parent mouseover
           me.hover(function(){
             isOverPanel = TRUE;
@@ -325,6 +317,28 @@
               hideBar();
             });
           }
+        }
+
+        // attach events when not requested to show rail always.
+        if (!config.alwaysVisible)
+        {
+          // on rail over
+          rail.hover(function(){
+            showBar();
+            isOverRail = config.railVisible;
+          }, function(){
+            hideBar();
+            isOverRail = FALSE;
+          });
+
+          // on bar over
+          bar.hover(function(){
+            isOverBar = TRUE;
+          }, function(){
+            isOverBar = FALSE;
+          });
+
+          attachMouseEvents();
         }
 
         // support for mobile
