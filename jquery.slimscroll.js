@@ -18,7 +18,7 @@
  * - Added vertical distance (baseline) support;
  * - Added support for glowing border around rail.
  *
- * Version: 1.0.9.4
+ * Version: 1.0.9.5
  *
  */
 
