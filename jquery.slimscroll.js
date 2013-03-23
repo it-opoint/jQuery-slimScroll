@@ -29,33 +29,33 @@
 
   // Global variables (within the closure) used by all slimScroll instances.
   var defaults = {
-        wheelStep : 20,
-        width : 'auto',
-        height : '250px',
-        size : '7px',
+        wheelStep: 20,
+        width: 'auto',
+        height: '250px',
+        size: '7px',
         color: '#000',
-        position : 'right',
-        distance : '3px',
-        baseline : '3px',
-        start : 'top',
-        opacity : .4,
-        alwaysVisible : FALSE,
+        position: 'right',
+        distance: '3px',
+        baseline: '3px',
+        start: 'top',
+        opacity: .4,
+        alwaysVisible: FALSE,
         disableFadeOut: FALSE,
-        railVisible : TRUE,
-        railOpacity : .2,
-        enableTouch : TRUE,
-        enableWheel : TRUE,
-        mouseSensitive : TRUE,
-        railColor : '#333',
-        useGlow : FALSE,
-        glowColor : '#fff',
-        glowSize : '3px',
-        classPrefix : 'slimScroll',
-        allowPageScroll : FALSE,
-        scroll : 0,
-        touchScrollStep : 200,
-        fadeDelay : 400,
-        hideDelay : 1000
+        railVisible: TRUE,
+        railOpacity: .2,
+        enableTouch: TRUE,
+        enableWheel: TRUE,
+        mouseSensitive: TRUE,
+        railColor: '#333',
+        useGlow: FALSE,
+        glowColor: '#fff',
+        glowSize: '3px',
+        classPrefix: 'slimScroll',
+        allowPageScroll: FALSE,
+        scroll: 0,
+        touchScrollStep: 200,
+        fadeDelay: 400,
+        hideDelay: 1000
       },
 
       // DIV string prototype
@@ -101,7 +101,7 @@
 
       // do it for every element that matches selector
       this.each(function() {
-        var isOverPanel, isOverRail, isOverBar, isDragg, queueHide, touchDif,
+        var isOverPanel, isOverRail, isOverBar, isDragg, touchDiff,
             barHeight, percentScroll, lastScroll,
             minBarHeight = 30,
             releaseScroll = FALSE,
@@ -308,6 +308,12 @@
               delta = percentScroll * (me[0].scrollHeight - me.outerHeight());
 
               if (isJump) {
+                // If jumping to a specific location, hide the rail and bar.
+                // They'll be later shown when scrolling is done.
+                bar.hide();
+                if (config.railVisible)
+                  rail.hide();
+
                 delta = yPos;
                 var offsetTop = delta / me[0].scrollHeight * railWH;
                 offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
@@ -352,12 +358,16 @@
               getRailWrapper().css({visibility: 'visible'});
             },
 
+            clearTimer = function() {
+              if (dom.queueHide) {
+                clearTimeout(dom.queueHide);
+                dom.queueHide = NULL;
+              }
+            },
+
             showBar = function() {
               // clear the timer responsible for hiding the scrollbar
-              if (queueHide) {
-                clearTimeout(queueHide);
-                queueHide = NULL;
-              }
+              clearTimer();
 
               // recalculate bar height
               getBarHeight();
@@ -391,9 +401,10 @@
 
             hideBar = function() {
               // only hide when options allow it
-              if (!config.alwaysVisible && !queueHide) {
-                queueHide = setTimeout(function() {
-                  queueHide = NULL;
+              if (!config.alwaysVisible) {
+                clearTimer();
+                dom.queueHide = setTimeout(function() {
+                  dom.queueHide = NULL;
                   if (!(config.disableFadeOut && isOverPanel) && !isOverRail && !isOverBar && !isDragg) {
                     if (config.railVisible) {
                       rail.fadeOut(config.fadeDelay);
@@ -527,7 +538,7 @@
           me.bind('touchstart', function(e,b) {
             if (e.originalEvent.touches.length) {
               // record where touch started
-              touchDif = e.originalEvent.touches[0].pageY;
+              touchDiff = e.originalEvent.touches[0].pageY;
             }
           });
 
@@ -536,7 +547,7 @@
             evt.originalEvent.preventDefault();
             if (evt.originalEvent.touches.length) {
               // see how far user swiped
-              var diff = (touchDif - evt.originalEvent.touches[0].pageY) / config.touchScrollStep;
+              var diff = (touchDiff - evt.originalEvent.touches[0].pageY) / config.touchScrollStep;
               // scroll content
               scrollContent(diff, TRUE);
             }
