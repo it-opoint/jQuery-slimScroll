@@ -48,6 +48,7 @@
         mouseSensitive: TRUE,
         railColor: '#333',
         useGlow: FALSE,
+        useRounded: TRUE,
         glowColor: '#fff',
         glowSize: '3px',
         classPrefix: 'slimScroll',
@@ -66,6 +67,11 @@
         // override defaults with user's options
         var config = $.extend(defaults, options);
 
+        // If a rest size is not passed, use the size instead.
+        if(!options.restSize) {
+          config.restSize = '' + config.size;
+        }
+
         // adjust few more options manually
         config.railClass = config.classPrefix + 'Rail',
         config.railWrapperClass = config.classPrefix + 'RailDiv',
@@ -82,8 +88,15 @@
         css['-moz-' + entity]    =
         css['-ms-' + entity]     =
         css['-o-' + entity]      =
-        css[entity]              = value;
+        css[entity]              = ('' + value);
         return css;
+      },
+
+      configureBorderRadius = function(rail, bar, size, useRounded) {
+        var css = FALSE !== useRounded ? getExtendedCSS('border-radius', parseInt(size) + 'px') : {};
+        css.width = size;
+        rail.css(css);
+        bar.css(css);
       },
 
       // Normalize document.
@@ -119,8 +132,8 @@
                 position: 'absolute',
                 top: 0,
                 bottom: 0,
-                left: 0,
                 right: 0,
+                width: config.restSize,
                 background: config.railColor,
                 opacity: config.railOpacity,
                 zIndex: 95
@@ -133,8 +146,8 @@
                 display: config.alwaysVisible ? 'block' : 'none',
                 position: 'absolute',
                 top: 0,
-                left: 0,
                 right: 0,
+                width: config.restSize,
                 background: config.color,
                 opacity: config.opacity,
                 zIndex: 99
@@ -469,9 +482,7 @@
         } else {
           // set border radius for rail and scrollbar
           if(parseInt(config.size) > 0) {
-            variable = getExtendedCSS('border-radius', config.size);
-            rail.css(variable);
-            bar.css(variable);
+            configureBorderRadius(rail, bar, config.restSize, config.useRounded);
           }
 
           // check if a glow should be added too
@@ -515,6 +526,60 @@
           // append rail and scrollbar to the rail wrapper
           railW.append(rail);
           railW.append(bar);
+
+          // If rest size is different than size, attach a hover handler on railW.
+          if(config.size != config.restSize) {
+            (function(size, restSize, useRounded) {
+              var hideTimer,
+                  showTimer,
+                  resetTimer,
+                  isHovering,
+                  resetStyles = function() {
+                    if(!resetTimer) {
+                      resetTimer = setInterval(resetStyles, 100);
+                    } else {
+                      if(!isHovering && !isDragg) {
+                        clearInterval(resetTimer);
+                        resetTimer = undefined;
+                        configureBorderRadius(rail, bar, restSize, useRounded);
+                      }
+                    }
+                  };
+
+              railW.hover(
+                // ON.
+                function() {
+                  isHovering = TRUE;
+                  if(!showTimer) {
+                    showTimer = setTimeout(function() {
+                      showTimer = undefined;
+                      if(hideTimer) {
+                        clearTimeout(hideTimer);
+                        hideTimer = undefined;
+                      }
+                      configureBorderRadius(rail, bar, size, useRounded);
+                    }, 200);
+                  }
+                },
+
+                // OFF.
+                function() {
+                  isHovering = FALSE;
+                  if(showTimer) {
+                    clearTimeout(showTimer);
+                    showTimer = undefined;
+                  }
+                  if(hideTimer) {
+                    clearTimeout(hideTimer);
+                  }
+                  hideTimer = setTimeout(function() {
+                    hideTimer = undefined;
+                    resetStyles();
+                  }, config.hideDelay / 2);
+                }
+              );
+            })(config.size, config.restSize, config.useRounded);
+          }
 
           // append rail wrapper to parent div
           me.parent().append(railW);
