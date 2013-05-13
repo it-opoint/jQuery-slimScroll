@@ -108,12 +108,13 @@
   // extend jQuery's prototype and define slimScroll.
   $.fn.extend({
     slimScroll: function(options) {
+      var collection = this,
 
-      // override defaults with user's options
-      var config = configureInstance(options);
+          // override defaults with user's options only once.
+          config = collection.data('slimScrollConfig') || configureInstance(options);
 
-      // do it for every element that matches selector
-      this.each(function() {
+      // do it for every element that matches selector.
+      collection.each(function() {
         var isOverPanel, isOverRail, isOverBar, isDragg, touchDiff,
             barHeight, percentScroll, lastScroll,
             minBarHeight = 30,
@@ -194,7 +195,7 @@
             },
 
             detachMouseWheel = function() {
-              if (dom.addEventListener) {
+              if(dom.addEventListener) {
                 dom.removeEventListener('DOMMouseScroll', mouseWheelHandler, FALSE);
                 dom.removeEventListener('mousewheel', mouseWheelHandler, FALSE);
               } else {
@@ -221,54 +222,51 @@
                 }
               });
 
-              // attach events when not requested to show rail always.
-              if (!config.alwaysVisible) {
-                // on rail over
-                try { rail.unbind('mouseenter mouseleave'); } catch (ignored) { }
-                rail.hover(function(){
-                  showBar();
-                  isOverRail = config.railVisible;
-                }, function(){
-                  hideBar();
-                  isOverRail = FALSE;
-                });
+              // on rail over
+              try { rail.unbind('mouseenter mouseleave'); } catch (ignored) { }
+              rail.hover(function(){
+                showBar();
+                isOverRail = config.railVisible;
+              }, function(){
+                hideBar();
+                isOverRail = FALSE;
+              });
 
-                // on bar over
-                try { bar.unbind('mouseenter mouseleave'); } catch (ignored) { }
-                bar.hover(function(){
-                  isOverBar = TRUE;
-                }, function(){
-                  isOverBar = FALSE;
-                });
+              // on bar over
+              try { bar.unbind('mouseenter mouseleave'); } catch (ignored) { }
+              bar.hover(function(){
+                isOverBar = TRUE;
+              }, function(){
+                isOverBar = FALSE;
+              });
 
-                // show on parent mouseover
-                try { me.unbind('mouseenter mouseleave'); } catch (ignored) { }
-                me.hover(function(){
+              // show on parent mouseover
+              try { me.unbind('mouseenter mouseleave'); } catch (ignored) { }
+              me.hover(function(){
+                isOverPanel = TRUE;
+                showBar();
+                hideBar();
+              }, function(){
+                isOverPanel = FALSE;
+                hideBar();
+              });
+
+              // show/hide scrollbar when mouse moves?
+              if (config.mouseSensitive) {
+                // show on mouseover
+                try { me.unbind('mousemove'); } catch (ignored) { }
+                me.mousemove(function(){
                   isOverPanel = TRUE;
                   showBar();
                   hideBar();
-                }, function(){
+                });
+
+                // hide on mouseleave
+                try { me.unbind('mouseleave'); } catch (ignored) { }
+                me.mouseleave(function(){
                   isOverPanel = FALSE;
                   hideBar();
                 });
-
-                // show/hide scrollbar when mouse moves?
-                if (config.mouseSensitive) {
-                  // show on mouseover
-                  try { me.unbind('mousemove'); } catch (ignored) { }
-                  me.mousemove(function(){
-                    isOverPanel = TRUE;
-                    showBar();
-                    hideBar();
-                  });
-
-                  // hide on mouseleave
-                  try { me.unbind('mouseleave'); } catch (ignored) { }
-                  me.mouseleave(function(){
-                    isOverPanel = FALSE;
-                    hideBar();
-                  });
-                }
               }
 
               // detach mouse wheel events
@@ -440,7 +438,7 @@
             getBarHeight();
 
             // check if we should scroll existing instance
-            if (options) {
+            if(options) {
               // Set new HTML inside scroller.
               if ('html' in options) {
                 me.html(options['html']);
@@ -454,14 +452,14 @@
               }
               if ('scrollTo' in options) {
                 // jump to a static point (DOM node or numeric)
-                variable = typeof config.scrollTo;
+                variable = typeof options.scrollTo;
                 if ('number' === variable || ('string' === variable && /^\d+(\.\d+)?px?$/.test(variable)))
-                  scrollTo = parseInt(config.scrollTo);
+                  scrollTo = parseInt(options.scrollTo);
                 else
-                  scrollTo = getPreferredScrollPos(scrollTo, $(config.scrollTo, me));
+                  scrollTo = getPreferredScrollPos(scrollTo, $(options.scrollTo, me));
               } else if ('scrollBy' in options) {
                 // jump by value pixels
-                scrollTo += parseInt(config.scrollBy);
+                scrollTo += parseInt(options.scrollBy);
               } else if ('destroy' in options) {
                 // remove slimscroll elements
                 getRailWrapper().remove();
@@ -644,8 +642,11 @@
         }
       });
 
+      // keep the original config for this collection.
+      collection.data('slimScrollConfig', config);
+
       // maintain chainability
-      return this;
+      return collection;
     }
   });
 
