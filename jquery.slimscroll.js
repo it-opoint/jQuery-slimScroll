@@ -65,7 +65,7 @@
       // override defaults with user's options
       configureInstance = function(options) {
         // override defaults with user's options
-        var config = $.extend(defaults, options);
+        var config = $.extend({}, defaults, options);
 
         // If a rest size is not passed, use the size instead.
         if(!options.restSize) {
