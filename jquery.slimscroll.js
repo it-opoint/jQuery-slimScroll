@@ -319,12 +319,6 @@
               delta = percentScroll * (me[0].scrollHeight - me.outerHeight());
 
               if (isJump) {
-                // If jumping to a specific location, hide the rail and bar.
-                // They'll be later shown when scrolling is done.
-                bar.hide();
-                if (config.railVisible)
-                  rail.hide();
-
                 delta = yPos;
                 var offsetTop = delta / me[0].scrollHeight * railWH;
                 offsetTop = Math.min(Math.max(offsetTop, 0), maxTop);
@@ -335,7 +329,7 @@
               me.scrollTop(delta);
 
               // ensure bar is visible
-              showBar();
+              showBarIfNeeded(TRUE);
 
               // trigger hide when scroll is stopped
               hideBar();
@@ -376,29 +370,19 @@
               }
             },
 
-            showBar = function() {
-              // clear the timer responsible for hiding the scrollbar
-              clearTimer();
-
+            showBarIfNeeded = function(forceHide) {
               // recalculate bar height
               getBarHeight();
 
-              // when bar reached top or bottom
-              if (percentScroll === ~~ percentScroll) {
-                //release wheel
-                releaseScroll = config.allowPageScroll;
-
-                // publish approporiate event
-                if (lastScroll !== percentScroll) {
-                    me.trigger('slimscroll', (~~percentScroll === 0) ? 'top' : 'bottom');
-                }
-              }
-              lastScroll = percentScroll;
-
               // show only when required
-              if(barHeight >= getRailWrapperHeight()) {
-                //allow window scroll
+              if (barHeight >= getRailWrapperHeight()) {
                 releaseScroll = TRUE;
+                if(TRUE === forceHide) {
+                  if (config.railVisible) {
+                    rail.hide();
+                  }
+                  bar.hide();
+                }
               } else {
                 if (config.railVisible) {
                   rail.stop(TRUE, TRUE).fadeIn(config.fadeDelay);
@@ -408,6 +392,26 @@
 
               // show the rail wrapper
               showRailWrapper();
+            },
+
+            showBar = function() {
+              // clear the timer responsible for hiding the scrollbar
+              clearTimer();
+
+              // show the scroll bar only if needed
+              showBarIfNeeded();
+
+              // when bar reached top or bottom
+              if (!releaseScroll && percentScroll === ~~ percentScroll) {
+                //release wheel
+                releaseScroll = config.allowPageScroll;
+
+                // publish approporiate event
+                if (lastScroll !== percentScroll) {
+                    me.trigger('slimscroll', (~~percentScroll === 0) ? 'top' : 'bottom');
+                }
+              }
+              lastScroll = percentScroll;
             },
 
             hideBar = function() {
