@@ -318,19 +318,14 @@
       } else {
         // Set new HTML inside scroller.
         if('html' in options) {
-          var div = $('<div/>').html(options['html']);
-          div = div[0];
-          while(el[0].firstChild)
-            el[0].removeChild(el[0].firstChild);
-          while(div.firstChild)
-            el[0].appendChild(div.firstChild);
+          self.el.html(options['html']);
 
           // Setting new HTML unbinds all events on the DOM element,
           // and also its children. See:
           // http://friendlybit.com/js/manipulating-innerhtml-removes-events/
           // Anyway, we do it manually too, maybe this changes in the future.
-//                self.detachMouseWheel();
-//                self.attachMouseEvents(FALSE);
+          self.detachMouseWheel();
+          self.attachMouseEvents(FALSE);
         }
         if('scrollTo' in options) {
           // Jump to a static point (DOM node or numeric).
