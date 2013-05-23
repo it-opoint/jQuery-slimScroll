@@ -22,10 +22,9 @@
  *
  */
 
-'use strict';
-
 // used in various places, results in better minification
 (function($, window, Math, parseInt, setTimeout, clearTimeout, TRUE, FALSE, NULL) {
+  'use strict';
 
   var document = window.document,
 
